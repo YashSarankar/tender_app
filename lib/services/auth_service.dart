@@ -62,6 +62,9 @@ class AuthService {
         final Map<String, dynamic> data = json.decode(response.body);
         
         if (data['error'] == false) {
+          //save user id to shared preferences
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('user_id', data['client']['id'].toString());
           final userData = data['client'] as Map<String, dynamic>;
           await saveLoginState(userData, email, password);
           return (userData, null);

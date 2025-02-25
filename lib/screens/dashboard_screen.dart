@@ -5,11 +5,12 @@ import 'package:tender_app/widgets/document_card.dart';
 import 'package:tender_app/screens/profile_screen.dart';
 import 'package:tender_app/theme/app_theme.dart';
 import 'package:tender_app/services/auth_service.dart';
+import 'package:tender_app/screens/documents_screen.dart';
+import 'package:tender_app/screens/enquiry_screen.dart';
+import 'package:tender_app/screens/notifications_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({
-    super.key,
-  });
+  const DashboardScreen({super.key});
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -18,39 +19,10 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
-    final List<Document> documents = [
-      Document(
-        title: 'Aadhar Card',
-        icon: Icons.credit_card,
-        status: 'Valid',
-        startDate: DateTime(2023, 1, 1),
-        endDate: DateTime(2033, 1, 1),
-      ),
-      Document(
-        title: 'PAN Card',
-        icon: Icons.account_balance_wallet,
-        status: 'Expiring Soon',
-        startDate: DateTime(2023, 1, 1),
-        endDate: DateTime(2024, 5, 1),
-      ),
-      Document(
-        title: 'Voter ID',
-        icon: Icons.how_to_vote,
-        status: 'Not Added',
-      ),
-      Document(
-        title: 'Driving License',
-        icon: Icons.drive_eta,
-        status: 'Not Added',
-      ),
-    ];
-
     return Scaffold(
-      backgroundColor: Colors.grey[100], // Light gray background
+      backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: AppTheme.primaryRed,
         centerTitle: false,
         title: Row(
           children: [
@@ -73,50 +45,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ],
         ),
         actions: [
-          IconButton(
-            icon: Stack(
-              children: [
-                const Icon(
-                  Icons.notifications_outlined,
-                  color: Colors.black54,
-                  size: 24,
-                ),
-                Positioned(
-                  right: 0,
-                  top: 0,
-                  child: Container(
-                    padding: const EdgeInsets.all(2),
-                    decoration: BoxDecoration(
-                      color: AppTheme.primaryRed,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    constraints: const BoxConstraints(
-                      minWidth: 12,
-                      minHeight: 12,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            onPressed: () {
-              // Handle notifications
-            },
-          ),
-          IconButton(
-            icon: const Icon(
-              Icons.person_outline,
-              color: Colors.black54,
-              size: 24,
-            ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ProfileScreen(),
-                ),
-              );
-            },
-          ),
           Padding(
             padding: const EdgeInsets.only(right: 16),
             child: IconButton(
@@ -141,149 +69,103 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ],
       ),
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(32),
-                bottomRight: Radius.circular(32),
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Welcome back,',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey[600],
-                  ),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Your Documents',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: AppTheme.primaryRed.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: AppTheme.primaryRed.withOpacity(0.2),
-                    ),
-                  ),
-                  child: Row(
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 20),
+                  Row(
                     children: [
-                      Icon(
-                        Icons.info_outline,
-                        color: AppTheme.primaryRed,
-                        size: 20,
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppTheme.primaryRed.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(
+                          Icons.dashboard_rounded,
+                          color: AppTheme.primaryRed,
+                          size: 20,
+                        ),
                       ),
                       const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          documents.any((doc) => doc.status == 'Expiring Soon')
-                              ? 'Some of your documents are expiring soon. Please renew them.'
-                              : 'Track your document validity dates here',
-                          style: TextStyle(
-                            color: AppTheme.primaryRed,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: ListView.separated(
-              padding: const EdgeInsets.all(24),
-              itemCount: documents.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 16),
-              itemBuilder: (context, index) {
-                final document = documents[index];
-                return Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        spreadRadius: 1,
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 12,
-                    ),
-                    leading: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppTheme.primaryRed.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(
-                        document.icon,
-                        color: AppTheme.primaryRed,
-                        size: 24,
-                      ),
-                    ),
-                    title: Text(
-                      document.title,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
-                      ),
-                    ),
-                    subtitle: document.startDate != null
-                        ? Text(
-                            'Valid until ${document.endDate?.year}',
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                              fontSize: 14,
-                            ),
-                          )
-                        : null,
-                    trailing: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _getStatusColor(document.status).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        document.status,
+                      const Text(
+                        'Dashboard Overview',
                         style: TextStyle(
-                          color: _getStatusColor(document.status),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: -0.5,
                         ),
                       ),
-                    ),
-                    onTap: () {
-                      // Handle document tap
+                    ],
+                  ),
+                  ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: 5,
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    separatorBuilder: (context, index) => const SizedBox(height: 16),
+                    itemBuilder: (context, index) {
+                      final items = [
+                        {
+                          'title': 'All Digital Signature',
+                          'count': '3',
+                          'icon': Icons.verified_rounded,
+                          'color': const Color(0xFF4CAF50),
+                          'bgColor': const Color(0xFFE8F5E9),
+                          'isDigital': true,
+                        },
+                        {
+                          'title': 'Near to Expire Digital Signature',
+                          'count': '0',
+                          'icon': Icons.timer_rounded,
+                          'color': const Color(0xFFFFA000),
+                          'bgColor': const Color(0xFFFFF3E0),
+                          'isDigital': true,
+                        },
+                        {
+                          'title': 'Expired Digital Signature',
+                          'count': '2',
+                          'icon': Icons.warning_rounded,
+                          'color': const Color(0xFFF44336),
+                          'bgColor': const Color(0xFFFFEBEE),
+                          'isDigital': true,
+                        },
+                        {
+                          'title': 'Expired Documents',
+                          'count': '0',
+                          'icon': Icons.description_rounded,
+                          'color': const Color(0xFF2196F3),
+                          'bgColor': const Color(0xFFE3F2FD),
+                          'isDigital': false,
+                        },
+                        {
+                          'title': 'Near to Expire Documents',
+                          'count': '0',
+                          'icon': Icons.timer_rounded,
+                          'color': const Color(0xFF9C27B0),
+                          'bgColor': const Color(0xFFF3E5F5),
+                          'isDigital': false,
+                        },
+                      ];
+
+                      final item = items[index];
+                      return _buildStatsCard(
+                        title: item['title'] as String,
+                        count: item['count'] as String,
+                        icon: item['icon'] as IconData,
+                        color: item['color'] as Color,
+                        bgColor: item['bgColor'] as Color,
+                        isDigital: item['isDigital'] as bool,
+                        onTap: () => print('${item['title']} tapped'),
+                      );
                     },
                   ),
-                );
-              },
+                ],
+              ),
             ),
           ),
         ],
@@ -291,18 +173,94 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Color _getStatusColor(String status) {
-    switch (status.toLowerCase()) {
-      case 'valid':
-        return Colors.green;
-      case 'expiring soon':
-        return Colors.orange;
-      case 'expired':
-        return Colors.red;
-      case 'not added':
-        return Colors.grey;
-      default:
-        return Colors.grey;
-    }
+  Widget _buildStatsCard({
+    required String title,
+    required String count,
+    required IconData icon,
+    required Color color,
+    required Color bgColor,
+    required bool isDigital,
+    required VoidCallback onTap,
+  }) {
+    return Card(
+      elevation: 0,
+      margin: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: color.withOpacity(0.1)),
+        ),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: bgColor,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        icon,
+                        color: color,
+                        size: 20,
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: color.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        isDigital ? 'see all' : 'see details',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: color,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  count,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                    height: 1,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey[700],
+                    height: 1.2,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 } 

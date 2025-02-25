@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tender_app/screens/dashboard_screen.dart';
 import 'package:tender_app/screens/login_screen.dart';
+import 'package:tender_app/screens/main_screen.dart';
 import 'package:tender_app/theme/app_theme.dart';
 import 'package:tender_app/services/auth_service.dart';
 
@@ -55,11 +56,11 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     print('Auto login result - Client: ${client != null}, Error: $error');
 
     if (client != null) {
-      print('Navigating to Dashboard');
+      print('Navigating to Main Screen');
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => DashboardScreen(),
+          builder: (context) => const MainScreen(),
         ),
       );
     } else {
