@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tender_app/theme/app_theme.dart';
 
 class EnquiryScreen extends StatefulWidget {
   const EnquiryScreen({super.key});
@@ -35,21 +36,20 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
   InputDecoration _getInputDecoration(String label, IconData icon) {
     return InputDecoration(
       labelText: label,
-      prefixIcon: Icon(icon, color: Theme.of(context).primaryColor),
+      prefixIcon: Icon(icon),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Theme.of(context).primaryColor),
+        borderRadius: BorderRadius.circular(8),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: Theme.of(context).dividerColor),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2),
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: Theme.of(context).primaryColor),
       ),
       filled: true,
-      fillColor: Colors.grey.shade50,
+      fillColor: Theme.of(context).cardColor,
     );
   }
 
@@ -58,9 +58,11 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('ENQUIRY', style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),),
+        title: Text(
+          'ENQUIRY',
+          style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
-        elevation: 0,
       ),
       body: Container(
         child: SingleChildScrollView(
@@ -136,16 +138,13 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    elevation: 2,
+                    elevation: 1,
                   ),
-                  child: const Text(
+                  child: Text(
                     'Send Message',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
               ],

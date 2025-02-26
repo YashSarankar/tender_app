@@ -40,38 +40,35 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     );
 
     _controller.forward();
-    _navigateToLogin();
+    
+    // Wait for both animation and minimum display time
+    Future.wait([
+      _controller.animateTo(1.0, duration: Duration(milliseconds: 1000)),
+        Future.delayed(Duration(milliseconds: 1500)),
+        _checkAuth(),
+    ]).then((_) => _navigateToNextScreen());
   }
 
-  Future<void> _navigateToLogin() async {
-    print('Starting navigation delay');
-    await Future.delayed(const Duration(milliseconds: 1000));
-    if (!mounted) return;
-
-    print('Attempting auto login');
+  Future<(Map<String, dynamic>?, String?)> _checkAuth() async {
     final authService = AuthService();
-    final (client, error) = await authService.autoLogin();
+    return await authService.autoLogin();
+  }
+
+  void _navigateToNextScreen() async {
+    if (!mounted) return;
+    
+    final (client, error) = await _checkAuth();
     
     if (!mounted) return;
-    print('Auto login result - Client: ${client != null}, Error: $error');
 
-    if (client != null) {
-      print('Navigating to Main Screen');
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const MainScreen(),
-        ),
-      );
-    } else {
-      print('Navigating to Login');
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const LoginScreen(),
-        ),
-      );
-    }
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => client != null 
+          ? const MainScreen()
+          : const LoginScreen(),
+      ),
+    );
   }
 
   @override

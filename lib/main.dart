@@ -21,20 +21,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: AppTheme.primaryRed),
         useMaterial3: true,
       ),
-      home: FutureBuilder<(Map<String, dynamic>?, String?)>(
-        future: AuthService().autoLogin(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const SplashScreen();
-          }
-          
-          final data = snapshot.data;
-          if (data != null && data.$1 != null) {
-            return const MainScreen();
-          }
-          return const LoginScreen();
-        },
-      ),
+      home: const SplashScreen(),
     );
   }
 }

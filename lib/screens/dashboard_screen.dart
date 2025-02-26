@@ -8,6 +8,8 @@ import 'package:tender_app/services/auth_service.dart';
 import 'package:tender_app/screens/documents_screen.dart';
 import 'package:tender_app/screens/enquiry_screen.dart';
 import 'package:tender_app/screens/notifications_screen.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -17,6 +19,35 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  Map<String, dynamic>? _documentStats;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchDocumentStats();
+  }
+
+  Future<void> _fetchDocumentStats() async {
+    try {
+      // TODO: Replace with actual user ID from auth service
+      const userId = '251';
+      final response = await http.get(
+        Uri.parse('https://crm.actthost.com/api/document-status-count/$userId'),
+      );
+      
+      if (response.statusCode == 200) {
+        setState(() {
+          _documentStats = json.decode(response.body);
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error fetching document stats: $e');
+      setState(() => _isLoading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,15 +85,129 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 size: 24,
               ),
               onPressed: () async {
-                await AuthService().logout();
-                if (!mounted) return;
-                
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const LoginScreen(),
-                  ),
+                // Show confirmation dialog
+                final bool? confirm = await showDialog<bool>(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return Dialog(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                      backgroundColor: Colors.transparent,
+                      child: Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.rectangle,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 10.0,
+                              offset: const Offset(0.0, 5.0),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).primaryColor.withOpacity(0.1),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.logout_rounded,
+                                color: Theme.of(context).primaryColor,
+                                size: 32,
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            const Text(
+                              'Logout',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            const Text(
+                              'Are you sure you want to logout?',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black54,
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.grey.shade100,
+                                      foregroundColor: Colors.black87,
+                                      elevation: 0,
+                                      padding: const EdgeInsets.symmetric(vertical: 16),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                    onPressed: () => Navigator.of(context).pop(false),
+                                    child: const Text(
+                                      'Cancel',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Theme.of(context).primaryColor,
+                                      foregroundColor: Colors.white,
+                                      elevation: 0,
+                                      padding: const EdgeInsets.symmetric(vertical: 16),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                    onPressed: () => Navigator.of(context).pop(true),
+                                    child: const Text(
+                                      'Logout',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
                 );
+
+                // Proceed with logout if confirmed
+                if (confirm == true) {
+                  await AuthService().logout();
+                  if (!mounted) return;
+                  
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const LoginScreen(),
+                    ),
+                  );
+                }
               },
             ),
           ),
@@ -105,38 +250,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ListView.separated(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: 5,
+                    itemCount: 3,
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     separatorBuilder: (context, index) => const SizedBox(height: 16),
                     itemBuilder: (context, index) {
                       final items = [
                         {
-                          'title': 'All Digital Signature',
-                          'count': '3',
-                          'icon': Icons.verified_rounded,
-                          'color': const Color(0xFF4CAF50),
-                          'bgColor': const Color(0xFFE8F5E9),
-                          'isDigital': true,
-                        },
-                        {
-                          'title': 'Near to Expire Digital Signature',
-                          'count': '0',
-                          'icon': Icons.timer_rounded,
-                          'color': const Color(0xFFFFA000),
-                          'bgColor': const Color(0xFFFFF3E0),
-                          'isDigital': true,
-                        },
-                        {
-                          'title': 'Expired Digital Signature',
-                          'count': '2',
-                          'icon': Icons.warning_rounded,
-                          'color': const Color(0xFFF44336),
-                          'bgColor': const Color(0xFFFFEBEE),
-                          'isDigital': true,
-                        },
-                        {
-                          'title': 'Expired Documents',
-                          'count': '0',
+                          'title': 'All Documents',
+                          'count': _isLoading ? '...' : '${_documentStats?['all_documents_count'] ?? 0}',
                           'icon': Icons.description_rounded,
                           'color': const Color(0xFF2196F3),
                           'bgColor': const Color(0xFFE3F2FD),
@@ -144,10 +265,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         },
                         {
                           'title': 'Near to Expire Documents',
-                          'count': '0',
+                          'count': _isLoading ? '...' : '${_documentStats?['near_expired_doc_client_count'] ?? 0}',
                           'icon': Icons.timer_rounded,
-                          'color': const Color(0xFF9C27B0),
-                          'bgColor': const Color(0xFFF3E5F5),
+                          'color': const Color(0xFFFFA000),
+                          'bgColor': const Color(0xFFFFF3E0),
+                          'isDigital': false,
+                        },
+                        {
+                          'title': 'Expired Documents',
+                          'count': _isLoading ? '...' : '${_documentStats?['expired_doc_client_count'] ?? 0}',
+                          'icon': Icons.warning_rounded,
+                          'color': const Color(0xFFF44336),
+                          'bgColor': const Color(0xFFFFEBEE),
                           'isDigital': false,
                         },
                       ];
