@@ -112,24 +112,27 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        elevation: 0,
+        backgroundColor: Colors.white,
         centerTitle: true,
         title: isSearching
             ? Container(
                 height: 40,
                 decoration: BoxDecoration(
                   color: Colors.grey[100],
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: TextField(
                   controller: _searchController,
                   autofocus: true,
                   decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
+                    prefixIcon: Icon(Icons.search, color: AppTheme.primaryRed),
                     suffixIcon: _searchController.text.isNotEmpty
                         ? IconButton(
-                            icon: Icon(Icons.clear, color: Colors.grey[600]),
+                            icon: const Icon(Icons.clear, color: AppTheme.primaryRed),
                             onPressed: () {
                               _searchController.clear();
                               filterDocuments('');
@@ -139,31 +142,26 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                     hintText: 'Search documents...',
                     hintStyle: TextStyle(color: Colors.grey[600]),
                     border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(
+                    contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 8,
                     ),
                   ),
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     color: Colors.black87,
                   ),
                   onChanged: filterDocuments,
                 ),
               )
-            : Row(
-                children: [
-                  Icon(Icons.document_scanner_outlined, color: Colors.black),
-                  SizedBox(width: 16),
-                  Text(
-                    'Documents',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                ],
+            : const Text(
+                'DOCUMENTS',
+                style: TextStyle(
+                  color: AppTheme.primaryRed,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.2,
+                ),
               ),
         actions: [
           IconButton(
@@ -177,25 +175,68 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
               });
             },
             icon: Icon(
-              isSearching ? Icons.arrow_back : Icons.search_outlined,
-              color: Colors.black,
+              isSearching ? Icons.close : Icons.search_outlined,
+              color: AppTheme.primaryRed,
             ),
           ),
         ],
-        elevation: 0,
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: CircularProgressIndicator(
+                color: AppTheme.primaryRed,
+              ),
+            )
           : error != null
-              ? Center(child: Text(error!))
-              : ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  itemCount: filteredDocuments.length,
-                  itemBuilder: (context, index) {
-                    final document = filteredDocuments[index];
-                    return DocumentCard(document: document);
-                  },
-                ),
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.error_outline,
+                        size: 48,
+                        color: Colors.red[300],
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        error!,
+                        style: TextStyle(
+                          color: Colors.grey[700],
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : filteredDocuments.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.folder_open,
+                            size: 48,
+                            color: Colors.grey[400],
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'No documents found',
+                            style: TextStyle(
+                              color: Colors.grey[700],
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: filteredDocuments.length,
+                      itemBuilder: (context, index) {
+                        final document = filteredDocuments[index];
+                        return DocumentCard(document: document);
+                      },
+                    ),
     );
   }
 } 

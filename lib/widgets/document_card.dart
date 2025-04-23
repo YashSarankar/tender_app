@@ -12,43 +12,60 @@ class DocumentCard extends StatelessWidget {
     this.onTap,
   });
 
+  bool get _isPermanentDocument {
+    final docName = document.documentName?.toLowerCase() ?? '';
+    return docName.contains('aadhar') || docName.contains('pan');
+  }
+
   Color get _cardBorderColor {
-    return document.isExpired 
-        ? Colors.red.withOpacity(0.5)
-        : Colors.green.withOpacity(0.5);
+    if (_isPermanentDocument || !document.isExpired) {
+      return Colors.green.withOpacity(0.5);
+    }
+    return Colors.red.withOpacity(0.5);
   }
 
   Color get _headerBackgroundColor {
-    return document.isExpired
-        ? Colors.red.withOpacity(0.1)
-        : Colors.green.withOpacity(0.1);
+    if (_isPermanentDocument || !document.isExpired) {
+      return Colors.green.withOpacity(0.08);
+    }
+    return Colors.red.withOpacity(0.08);
   }
 
   Color get _iconColor {
-    return document.isExpired ? Colors.red : Colors.green;
+    if (_isPermanentDocument || !document.isExpired) {
+      return Colors.green;
+    }
+    return Colors.red;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 0,
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      shape: RoundedRectangleBorder(
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(
-          color: _cardBorderColor,
-          width: 1,
-        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.08),
+            spreadRadius: 1,
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHeader(),
-            _buildBody(),
-          ],
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeader(),
+              _buildBody(),
+            ],
+          ),
         ),
       ),
     );
@@ -104,6 +121,34 @@ class DocumentCard extends StatelessWidget {
   }
 
   Widget _buildStatusBadge() {
+    if (_isPermanentDocument) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: Colors.green.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.verified_outlined,
+              size: 14,
+              color: Colors.green,
+            ),
+            SizedBox(width: 4),
+            Text(
+              'Permanent',
+              style: TextStyle(
+                color: Colors.green,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(

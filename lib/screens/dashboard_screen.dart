@@ -51,19 +51,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         elevation: 0,
+        backgroundColor: Colors.white,
         centerTitle: false,
         title: Row(
           children: [
             Container(
-              height: 32,
+              height: 36,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
                 border: Border(
                   right: BorderSide(
-                    color: Colors.grey[300]!,
+                    color: Colors.grey[200]!,
                     width: 1,
                   ),
                 ),
@@ -76,229 +78,109 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ],
         ),
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: IconButton(
-              icon: const Icon(
-                Icons.logout_outlined,
-                color: Colors.black54,
-                size: 24,
-              ),
-              onPressed: () async {
-                // Show confirmation dialog
-                final bool? confirm = await showDialog<bool>(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return Dialog(
-                      shape: RoundedRectangleBorder(
+          IconButton(
+            icon: const Icon(
+              Icons.logout_outlined,
+              color: AppTheme.primaryRed,
+              size: 24,
+            ),
+            onPressed: () => _showLogoutDialog(context),
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
+      body: RefreshIndicator(
+        color: AppTheme.primaryRed,
+        onRefresh: _fetchDocumentStats,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppTheme.primaryRed.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      elevation: 0,
-                      backgroundColor: Colors.transparent,
-                      child: Container(
-                        padding: const EdgeInsets.all(24),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.rectangle,
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 10.0,
-                              offset: const Offset(0.0, 5.0),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).primaryColor.withOpacity(0.1),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                Icons.logout_rounded,
-                                color: Theme.of(context).primaryColor,
-                                size: 32,
-                              ),
-                            ),
-                            const SizedBox(height: 24),
-                            const Text(
-                              'Logout',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            const Text(
-                              'Are you sure you want to logout?',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.black54,
-                              ),
-                            ),
-                            const SizedBox(height: 24),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.grey.shade100,
-                                      foregroundColor: Colors.black87,
-                                      elevation: 0,
-                                      padding: const EdgeInsets.symmetric(vertical: 16),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                    ),
-                                    onPressed: () => Navigator.of(context).pop(false),
-                                    child: const Text(
-                                      'Cancel',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Theme.of(context).primaryColor,
-                                      foregroundColor: Colors.white,
-                                      elevation: 0,
-                                      padding: const EdgeInsets.symmetric(vertical: 16),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                    ),
-                                    onPressed: () => Navigator.of(context).pop(true),
-                                    child: const Text(
-                                      'Logout',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                      child: const Icon(
+                        Icons.dashboard_rounded,
+                        color: AppTheme.primaryRed,
+                        size: 22,
                       ),
-                    );
-                  },
-                );
-
-                // Proceed with logout if confirmed
-                if (confirm == true) {
-                  await AuthService().logout();
-                  if (!mounted) return;
-                  
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const LoginScreen(),
                     ),
-                  );
-                }
-              },
-            ),
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: AppTheme.primaryRed.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Icon(
-                          Icons.dashboard_rounded,
-                          color: AppTheme.primaryRed,
-                          size: 20,
-                        ),
+                    const SizedBox(width: 12),
+                    const Text(
+                      'DASHBOARD',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.2,
+                        color: AppTheme.primaryRed,
                       ),
-                      const SizedBox(width: 12),
-                      const Text(
-                        'Dashboard Overview',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: -0.5,
-                        ),
-                      ),
-                    ],
-                  ),
-                  ListView.separated(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: 3,
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    separatorBuilder: (context, index) => const SizedBox(height: 16),
-                    itemBuilder: (context, index) {
-                      final items = [
-                        {
-                          'title': 'All Documents',
-                          'count': _isLoading ? '...' : '${_documentStats?['all_documents_count'] ?? 0}',
-                          'icon': Icons.description_rounded,
-                          'color': const Color(0xFF2196F3),
-                          'bgColor': const Color(0xFFE3F2FD),
-                          'isDigital': false,
-                        },
-                        {
-                          'title': 'Near to Expire Documents',
-                          'count': _isLoading ? '...' : '${_documentStats?['near_expired_doc_client_count'] ?? 0}',
-                          'icon': Icons.timer_rounded,
-                          'color': const Color(0xFFFFA000),
-                          'bgColor': const Color(0xFFFFF3E0),
-                          'isDigital': false,
-                        },
-                        {
-                          'title': 'Expired Documents',
-                          'count': _isLoading ? '...' : '${_documentStats?['expired_doc_client_count'] ?? 0}',
-                          'icon': Icons.warning_rounded,
-                          'color': const Color(0xFFF44336),
-                          'bgColor': const Color(0xFFFFEBEE),
-                          'isDigital': false,
-                        },
-                      ];
-
-                      final item = items[index];
-                      return _buildStatsCard(
-                        title: item['title'] as String,
-                        count: item['count'] as String,
-                        icon: item['icon'] as IconData,
-                        color: item['color'] as Color,
-                        bgColor: item['bgColor'] as Color,
-                        isDigital: item['isDigital'] as bool,
-                        onTap: () => print('${item['title']} tapped'),
-                      );
-                    },
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
-            ),
+              const SizedBox(height: 8),
+              _buildStatCards(),
+            ],
           ),
-        ],
+        ),
       ),
+    );
+  }
+
+  Widget _buildStatCards() {
+    final stats = [
+      {
+        'title': 'Total Documents',
+        'count': _isLoading ? '-' : '${_documentStats?['all_documents_count'] ?? 0}',
+        'icon': Icons.description_rounded,
+        'color': AppTheme.primaryRed,
+        'route': const DocumentsScreen(),
+      },
+      {
+        'title': 'Expiring Soon',
+        'count': _isLoading ? '-' : '${_documentStats?['near_expired_doc_client_count'] ?? 0}',
+        'icon': Icons.timer_rounded,
+        'color': const Color(0xFFFFA000),
+        'route': const DocumentsScreen(),
+      },
+      {
+        'title': 'Expired',
+        'count': _isLoading ? '-' : '${_documentStats?['expired_doc_client_count'] ?? 0}',
+        'icon': Icons.warning_rounded,
+        'color': const Color(0xFFF44336),
+        'route': const DocumentsScreen(),
+      },
+    ];
+
+    return ListView.separated(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      itemCount: stats.length,
+      separatorBuilder: (context, index) => const SizedBox(height: 12),
+      itemBuilder: (context, index) {
+        final stat = stats[index];
+        return _buildStatsCard(
+          title: stat['title'] as String,
+          count: stat['count'] as String,
+          icon: stat['icon'] as IconData,
+          color: stat['color'] as Color,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => stat['route'] as Widget),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -307,83 +189,71 @@ class _DashboardScreenState extends State<DashboardScreen> {
     required String count,
     required IconData icon,
     required Color color,
-    required Color bgColor,
-    required bool isDigital,
     required VoidCallback onTap,
   }) {
-    return Card(
-      elevation: 0,
-      margin: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.08),
+            blurRadius: 10,
+            spreadRadius: 1,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color.withOpacity(0.1)),
-        ),
+      child: Material(
+        color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(16),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            padding: const EdgeInsets.all(16),
+            child: Row(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: bgColor,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        icon,
-                        color: color,
-                        size: 20,
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: color.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        isDigital ? 'see all' : 'see details',
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    icon,
+                    color: color,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
                         style: TextStyle(
-                          fontSize: 12,
-                          color: color,
+                          fontSize: 16,
                           fontWeight: FontWeight.w500,
+                          color: Colors.grey[800],
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  count,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: color,
-                    height: 1,
+                      const SizedBox(height: 4),
+                      Text(
+                        count,
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: color,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey[700],
-                    height: 1.2,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+                Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  color: Colors.grey[400],
+                  size: 16,
                 ),
               ],
             ),
@@ -391,5 +261,127 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _showLogoutDialog(BuildContext context) async {
+    final bool? confirm = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 5),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryRed.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.logout_rounded,
+                    color: AppTheme.primaryRed,
+                    size: 32,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                const Text(
+                  'Logout',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Are you sure you want to logout?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.black54,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: const Text(
+                          'Cancel',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.primaryRed,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onPressed: () => Navigator.of(context).pop(true),
+                        child: const Text(
+                          'Logout',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    if (confirm == true) {
+      await AuthService().logout();
+      if (!mounted) return;
+      
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const LoginScreen(),
+        ),
+      );
+    }
   }
 } 

@@ -10,7 +10,8 @@ class AuthService {
   static const String baseUrl = 'https://crm.actthost.com/api';
 
   // Save login state and credentials
-  Future<void> saveLoginState(Map<String, dynamic> userData, String email, String password) async {
+  Future<void> saveLoginState(
+      Map<String, dynamic> userData, String email, String password) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_keyIsLoggedIn, true);
     await prefs.setString(_keyUserData, jsonEncode(userData));
@@ -52,7 +53,8 @@ class AuthService {
     await prefs.clear();
   }
 
-  Future<(Map<String, dynamic>?, String?)> login(String email, String password) async {
+  Future<(Map<String, dynamic>?, String?)> login(
+      String email, String password) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/login?email=$email&password=$password'),
@@ -60,7 +62,7 @@ class AuthService {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
-        
+
         if (data['error'] == false) {
           //save user id to shared preferences
           final prefs = await SharedPreferences.getInstance();
@@ -78,4 +80,4 @@ class AuthService {
       return (null, 'Network error occurred');
     }
   }
-} 
+}
